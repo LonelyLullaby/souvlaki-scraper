@@ -18,25 +18,35 @@ jobs:
         with:
           python-version: '3.11'
 
-      # 3. COMBINED STEP: Install all libraries, browsers, and build
-      - name: Install and Build
-        shell: pwsh  # Explicitly set shell to PowerShell
+      # 3. Upgrade pip
+      - name: Upgrade pip
+        shell: pwsh
         run: |
-          $ErrorActionPreference = 'Stop'  # <-- THE CRITICAL FIX
-          
-          Write-Host "--- 1. Upgrading pip ---"
+          $ErrorActionPreference = 'Stop'
           python -m pip install --upgrade pip
-          
-          Write-Host "--- 2. Installing requirements ---"
+
+      # 4. Install requirements
+      - name: Install dependencies from requirements.txt
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
           pip install -r requirements.txt
           
-          Write-Host "--- 3. Installing Playwright browsers ---"
+      # 5. Install Playwright browsers
+      - name: Install Playwright Browsers
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
           playwright install
-          
-          Write-Host "--- 4. Building executable ---"
-          python -m Pyinstaller --onefile --windowed --name "SouvlakiScraper" gui.py
 
-      # 4. Uploads the final .exe file
+      # 6. Build the executable
+      - name: Build executable
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          python -m pyinstaller --onefile --windowed --name "SouvlakiScraper" gui.py
+
+      # 7. Upload the final .exe file
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
