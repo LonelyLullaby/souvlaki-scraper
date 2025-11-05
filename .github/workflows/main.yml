@@ -33,7 +33,7 @@ jobs:
       # 5. Runs the PyInstaller command to build the .exe
       - name: Build executable
         run: |
-          pyinstaller --onefile --windowed --name "SouvlakiScraper" gui.py
+          python -m pyinstaller --onefile --windowed --name "SouvlakiScraper" gui.py
 
       # 6. Uploads the final .exe file as a downloadable "artifact"
       - name: Upload artifact
