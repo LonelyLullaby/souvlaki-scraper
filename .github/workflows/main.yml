@@ -20,10 +20,20 @@ jobs:
 
       # 3. COMBINED STEP: Install all libraries, browsers, and build
       - name: Install and Build
+        shell: pwsh  # Explicitly set shell to PowerShell
         run: |
+          $ErrorActionPreference = 'Stop'  # <-- THE CRITICAL FIX
+          
+          Write-Host "--- 1. Upgrading pip ---"
           python -m pip install --upgrade pip
+          
+          Write-Host "--- 2. Installing requirements ---"
           pip install -r requirements.txt
+          
+          Write-Host "--- 3. Installing Playwright browsers ---"
           playwright install
+          
+          Write-Host "--- 4. Building executable ---"
           python -m pyinstaller --onefile --windowed --name "SouvlakiScraper" gui.py
 
       # 4. Uploads the final .exe file
