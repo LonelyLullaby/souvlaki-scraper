@@ -36,7 +36,7 @@ jobs:
           python -m playwright install
           
           Write-Host "--- 4. Building executable ---"
-          python -m pyinstaller --onefile --windowed --name "SouvlakiScraper" gui.py
+          python -m Pyinstaller --onefile --windowed --name "SouvlakiScraper" gui.py
 
       # 4. Uploads the final .exe file
       - name: Upload artifact
