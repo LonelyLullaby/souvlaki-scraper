@@ -19,13 +19,12 @@ jobs:
         with:
           python-version: '3.11'
 
-      # 3. Install Nuitka and dependencies from requirements.txt
+      # 3. Install Nuitka and dependencies
       - name: Install dependencies
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
           ${{ steps.setup-python.outputs.python-path }} -m pip install --upgrade pip
-          # We add nuitka and ordered-set (a Nuitka dependency)
           ${{ steps.setup-python.outputs.python-path }} -m pip install nuitka ordered-set
           ${{ steps.setup-python.outputs.python-path }} -m pip install -r requirements.txt
 
@@ -36,19 +35,13 @@ jobs:
           $ErrorActionPreference = 'Stop'
           ${{ steps.setup-python.outputs.python-path }} -m playwright install
 
-      # 5. Build the executable with Nuitka
+      # 5. Build the executable with Nuitka (ONE-LINE FIX)
       - name: Build executable with Nuitka
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          ${{ steps.setup-python.outputs.python-path }} -m nuitka `
-            --onefile `
-            --windows-disable-console `
-            --enable-plugin=tk-inter `   # <-- THE FIX IS HERE
-            --enable-plugin=playwright `
-            --output-dir=dist `
-            --output-filename=SouvlakiScraper `
-            gui.py
+          # This is now one single line to avoid PowerShell parsing errors
+          ${{ steps.setup-python.outputs.python-path }} -m nuitka --onefile --windows-disable-console --enable-plugin=tk-inter --enable-plugin=playwright --output-dir=dist --output-filename=SouvlakiScraper gui.py
 
       # 6. Uploads the final .exe file
       - name: Upload artifact
