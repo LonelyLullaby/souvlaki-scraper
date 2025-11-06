@@ -27,7 +27,7 @@ jobs:
           
           Write-Host "--- 1. Upgrading pip ---"
           # Use the *exact* python.exe we just installed
-          ${{ steps.setup-python.outputs.python-path }} -m pip install --upgrade pip
+          ${{ steps.setup-python.outputs.python-path }} -m pip install pip==18.1
           
           Write-Host "--- 2. Installing requirements (from clean file) ---"
           # Use the *exact* python.exe to run pip
