@@ -45,7 +45,6 @@ jobs:
             --windows-console-mode=disable \
             --enable-plugin=tk-inter \
             --enable-plugin=playwright \
-            --enable-plugin=no-download \  # <--- THIS IS THE CRITICAL LINE
             --output-dir=dist \
             --output-filename=SouvlakiScraper \
             gui.py
