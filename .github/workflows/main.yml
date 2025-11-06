@@ -40,12 +40,12 @@ jobs:
         shell: bash
         run: |
           PYTHON_EXE="${{ steps.setup-python.outputs.python-path }}"
-          # --- NUITKA COMMAND FIX: Replaced old '--windows-disable-console' ---
           $PYTHON_EXE -m nuitka \
             --onefile \
             --windows-console-mode=disable \
             --enable-plugin=tk-inter \
             --enable-plugin=playwright \
+            --enable-plugin=no-qt \        # <-- CRITICAL FIX: Prevents dependency download issue
             --output-dir=dist \
             --output-filename=SouvlakiScraper \
             gui.py
