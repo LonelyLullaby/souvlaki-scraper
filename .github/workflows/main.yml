@@ -12,8 +12,9 @@ jobs:
       # 1. Checks out your code
       - uses: actions/checkout@v4
 
-      # 2. Sets up Python
+      # 2. Sets up Python and *saves its path*
       - name: Set up Python
+        id: setup-python  # Give this step an ID
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
@@ -25,18 +26,20 @@ jobs:
           $ErrorActionPreference = 'Stop'
           
           Write-Host "--- 1. Upgrading pip ---"
-          python -m pip install --upgrade pip
+          # Use the *exact* python.exe we just installed
+          ${{ steps.setup-python.outputs.python-path }} -m pip install --upgrade pip
           
           Write-Host "--- 2. Installing requirements ---"
-          # --- THE CRITICAL FIX: Use 'python -m pip' ---
-          python -m pip install -r requirements.txt
+          # Use the *exact* python.exe to run pip
+          ${{ steps.setup-python.outputs.python-path }} -m pip install -r requirements.txt
           
           Write-Host "--- 3. Installing Playwright browsers ---"
-          # Use 'python -m playwright' for consistency
-          python -m playwright install
+          # Use the *exact* python.exe to run playwright
+          ${{ steps.setup-python.outputs.python-path }} -m playwright install
           
           Write-Host "--- 4. Building executable ---"
-          python -m Pyinstaller --onefile --windowed --name "SouvlakiScraper" gui.py
+          # Use the *exact* python.exe to run pyinstaller
+          ${{ steps.setup-python.outputs.python-path }} -m pyinstaller --onefile --windowed --name "SouvlakiScraper" gui.py
 
       # 4. Uploads the final .exe file
       - name: Upload artifact
