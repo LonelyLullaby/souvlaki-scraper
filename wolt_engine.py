@@ -48,13 +48,13 @@ def scrape_wolt(my_address, search_term):
 
         try:
             # --- THIS IS THE FIX ---
-            # Tell Playwright to use the system's "firefox" channel
+            # Tell Playwright to use the system's "chromium" channel
             browser = p.chromium.launch(
                 headless=True,
                 executable_path="/usr/bin/chromium"
             )
 
-
+            # --- AND HERE IS THE MISSING PART ---
             context = browser.new_context(
                 user_agent="Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:125.0) Gecko/20100101 Firefox/125.0",
                 viewport={'width': 1920, 'height': 1080}

@@ -17,10 +17,12 @@ class ResultsWindow(tk.Toplevel):
         self.title("Wolt Scraper - Results")
         self.geometry("800x600")
 
+        # Store the full, unfiltered list of results
         self.all_results = results_data
 
         # --- Create Restaurant Filter ---
         ttk.Label(self, text="Filter by Restaurant:").pack(pady=(10, 0))
+
         shop_names = sorted(list(set([res[0] for res in self.all_results])))
 
         self.restaurant_filter = ttk.Combobox(self, state="readonly", width=50)
@@ -60,9 +62,11 @@ class ResultsWindow(tk.Toplevel):
 
         for shop_name, shop_url, item_name, item_price in self.all_results:
 
+            # 1. Check Restaurant Filter
             if selected_shop != "-- All Restaurants --" and shop_name != selected_shop:
                 continue
 
+            # 2. Check Search Bar Filter
             if search_query not in item_name.lower():
                 continue
 
@@ -70,20 +74,20 @@ class ResultsWindow(tk.Toplevel):
             self.listbox.insert("end", list_entry)
 
     def on_item_double_click(self, event):
-        # This function is now correctly placed and syntactically clean
         try:
             selected_index = self.listbox.curselection()[0]
             selected_text = self.listbox.get(selected_index)
         except IndexError:
-            return
-        except Exception:
             return
 
         for shop_name, shop_url, item_name, item_price in self.all_results:
             list_entry = f"€{item_price:<6.2f} --- {item_name} --- (at {shop_name})"
             if list_entry == selected_text:
                 print(f"Opening shop URL: {shop_url}")
+
+                # --- REVERTED: This is the universal "system default" command ---
                 webbrowser.open_new_tab(shop_url)
+                # ---------------------------------------------------------------
                 return
 
 
@@ -147,7 +151,8 @@ class App(tk.Tk):
         print("Scraper thread started...")
         results = scrape_wolt(address, food)
 
-        results.sort(key=lambda x: x[3])
+        # Sort the results by price
+        results.sort(key=lambda x: x[3]) # x[3] is the price
 
         self.after(0, callback, results)
 
@@ -157,8 +162,10 @@ class App(tk.Tk):
         if not results:
             self.status_label.config(text="Status: No results found. Try another search.")
         else:
+            # Open the results window
             ResultsWindow(self, results)
 
+        # Re-enable the button and reset status
         self.search_button.config(state="normal")
         self.status_label.config(text="Status: Idle")
 
