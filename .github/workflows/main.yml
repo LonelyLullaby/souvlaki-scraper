@@ -41,7 +41,7 @@ jobs:
         run: |
           $ErrorActionPreference = 'Stop'
           # This is now one single line to avoid PowerShell parsing errors
-          ${{ steps.setup-python.outputs.python-path }} -m nuitka --onefile --windows-disable-console --enable-plugin=tk-inter --enable-plugin=playwright --output-dir=dist --output-filename=SouvlakiScraper gui.py
+          ${{ steps.setup-python.outputs.python-path }} -m nuitka --onefile --windows-disable-console --enable-plugin=tk-inter --enable-plugin=playwright --output-dir=dist --output-filename=SouvlakiScraper ./gui.py
 
       # 6. Uploads the final .exe file
       - name: Upload artifact
