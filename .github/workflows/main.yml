@@ -37,14 +37,13 @@ jobs:
 
       # 5. Build the executable with Nuitka
       - name: Build executable with Nuitka
-        # --- THE FINAL FIX: Change shell to bash to handle paths correctly ---
         shell: bash
         run: |
           PYTHON_EXE="${{ steps.setup-python.outputs.python-path }}"
-          # Use the bash syntax to run Nuitka with the Python executable
+          # --- NUITKA COMMAND FIX: Replaced old '--windows-disable-console' ---
           $PYTHON_EXE -m nuitka \
             --onefile \
-            --windows-disable-console \
+            --windows-console-mode=disable \
             --enable-plugin=tk-inter \
             --enable-plugin=playwright \
             --output-dir=dist \
