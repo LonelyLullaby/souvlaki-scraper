@@ -14,47 +14,34 @@ jobs:
 
       # 2. Sets up Python
       - name: Set up Python
-        id: setup-python
+        id: setup-python # Give this step an ID
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      # 3. Upgrade pip
-      - name: Upgrade pip
+      # 3. COMBINED STEP: Install all libraries, browsers, and build
+      - name: Install and Build
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          ${{ steps.setup-python.outputs.python-path }} -m pip install --upgrade pip
-
-      # 4. Install PyInstaller SEPARATELY
-      - name: Install PyInstaller
-        shell: pwsh
-        run: |
-          $ErrorActionPreference = 'Stop'
-          ${{ steps.setup-python.outputs.python-path }} -m pip install pyinstaller pyinstaller-hooks-contrib
           
-      # 5. Install the rest of the requirements
-      - name: Install dependencies from requirements.txt
-        shell: pwsh
-        run: |
-          $ErrorActionPreference = 'Stop'
+          Write-Host "--- 1. Upgrading pip ---"
+          # Use the *exact* python.exe we just installed
+          ${{ steps.setup-python.outputs.python-path }} -m pip install --upgrade pip
+          
+          Write-Host "--- 2. Installing requirements (from clean file) ---"
+          # Use the *exact* python.exe to run pip
           ${{ steps.setup-python.outputs.python-path }} -m pip install -r requirements.txt
-
-      # 6. Install Playwright browsers
-      - name: Install Playwright Browsers
-        shell: pwsh
-        run: |
-          $ErrorActionPreference = 'Stop'
+          
+          Write-Host "--- 3. Installing Playwright browsers ---"
+          # Use the *exact* python.exe to run playwright
           ${{ steps.setup-python.outputs.python-path }} -m playwright install
-
-      # 7. Build the executable
-      - name: Build executable
-        shell: pwsh
-        run: |
-          $ErrorActionPreference = 'Stop'
+          
+          Write-Host "--- 4. Building executable ---"
+          # Use the *exact* python.exe to run pyinstaller
           ${{ steps.setup-python.outputs.python-path }} -m pyinstaller --onefile --windowed --name "SouvlakiScraper" gui.py
 
-      # 8. Upload the final .exe file
+      # 4. Uploads the final .exe file
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
