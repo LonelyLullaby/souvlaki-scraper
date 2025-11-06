@@ -40,13 +40,12 @@ jobs:
         shell: bash
         run: |
           PYTHON_EXE="${{ steps.setup-python.outputs.python-path }}"
-          # --- FINAL FIX: Added --enable-plugin=no-download to bypass the prompt ---
           $PYTHON_EXE -m nuitka \
             --onefile \
             --windows-console-mode=disable \
             --enable-plugin=tk-inter \
             --enable-plugin=playwright \
-            --enable-plugin=no-download \
+            --enable-plugin=no-download \  # <--- THIS IS THE CRITICAL LINE
             --output-dir=dist \
             --output-filename=SouvlakiScraper \
             gui.py
