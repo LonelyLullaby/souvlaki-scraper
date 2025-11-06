@@ -35,13 +35,21 @@ jobs:
           $ErrorActionPreference = 'Stop'
           ${{ steps.setup-python.outputs.python-path }} -m playwright install
 
-      # 5. Build the executable with Nuitka (ONE-LINE FIX)
+      # 5. Build the executable with Nuitka
       - name: Build executable with Nuitka
-        shell: pwsh
+        # --- THE FINAL FIX: Change shell to bash to handle paths correctly ---
+        shell: bash
         run: |
-          $ErrorActionPreference = 'Stop'
-          # This is now one single line to avoid PowerShell parsing errors
-          ${{ steps.setup-python.outputs.python-path }} -m nuitka --onefile --windows-disable-console --enable-plugin=tk-inter --enable-plugin=playwright --output-dir=dist --output-filename=SouvlakiScraper gui.py
+          PYTHON_EXE="${{ steps.setup-python.outputs.python-path }}"
+          # Use the bash syntax to run Nuitka with the Python executable
+          $PYTHON_EXE -m nuitka \
+            --onefile \
+            --windows-disable-console \
+            --enable-plugin=tk-inter \
+            --enable-plugin=playwright \
+            --output-dir=dist \
+            --output-filename=SouvlakiScraper \
+            gui.py
 
       # 6. Uploads the final .exe file
       - name: Upload artifact
