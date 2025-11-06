@@ -44,7 +44,7 @@ jobs:
           ${{ steps.setup-python.outputs.python-path }} -m nuitka `
             --onefile `
             --windows-disable-console `
-            --enable-plugin=tkinter `
+            --enable-plugin=tk-inter `   # <-- THE FIX IS HERE
             --enable-plugin=playwright `
             --output-dir=dist `
             --output-filename=SouvlakiScraper `
