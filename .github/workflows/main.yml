@@ -37,17 +37,11 @@ jobs:
 
       # 5. Build the executable with Nuitka
       - name: Build executable with Nuitka
-        shell: bash
+        shell: pwsh
         run: |
-          PYTHON_EXE="${{ steps.setup-python.outputs.python-path }}"
-          $PYTHON_EXE -m nuitka \
-            --onefile \
-            --windows-console-mode=disable \
-            --enable-plugin=tk-inter \
-            --enable-plugin=playwright \
-            --output-dir=dist \
-            --output-filename=SouvlakiScraper \
-            gui.py
+          $ErrorActionPreference = 'Stop'
+          # This is the final, one-line command with the 'no-qt' fix
+          ${{ steps.setup-python.outputs.python-path }} -m nuitka --onefile --windows-console-mode=disable --enable-plugin=tk-inter --enable-plugin=playwright --enable-plugin=no-qt --output-dir=dist --output-filename=SouvlakiScraper gui.py
 
       # 6. Uploads the final .exe file
       - name: Upload artifact
