@@ -1,4 +1,4 @@
-name: Build SouvlakiScraper for Windows
+name: Build SouvlakiScraper with Nuitka
 
 on:
   push:
@@ -14,34 +14,43 @@ jobs:
 
       # 2. Sets up Python
       - name: Set up Python
-        id: setup-python # Give this step an ID
+        id: setup-python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      # 3. COMBINED STEP: Install all libraries, browsers, and build
-      - name: Install and Build
+      # 3. Install Nuitka and dependencies from requirements.txt
+      - name: Install dependencies
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          
-          Write-Host "--- 1. Upgrading pip ---"
-          # Use the *exact* python.exe we just installed
-          ${{ steps.setup-python.outputs.python-path }} -m pip install pip==18.1
-          
-          Write-Host "--- 2. Installing requirements (from clean file) ---"
-          # Use the *exact* python.exe to run pip
+          ${{ steps.setup-python.outputs.python-path }} -m pip install --upgrade pip
+          # We add nuitka and ordered-set (a Nuitka dependency)
+          ${{ steps.setup-python.outputs.python-path }} -m pip install nuitka ordered-set
           ${{ steps.setup-python.outputs.python-path }} -m pip install -r requirements.txt
-          
-          Write-Host "--- 3. Installing Playwright browsers ---"
-          # Use the *exact* python.exe to run playwright
-          ${{ steps.setup-python.outputs.python-path }} -m playwright install
-          
-          Write-Host "--- 4. Building executable ---"
-          # Use the *exact* python.exe to run pyinstaller
-          ${{ steps.setup-python.outputs.python-path }} -m pyinstaller --onefile --windowed --name "SouvlakiScraper" gui.py
 
-      # 4. Uploads the final .exe file
+      # 4. Install Playwright browsers
+      - name: Install Playwright Browsers
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          ${{ steps.setup-python.outputs.python-path }} -m playwright install
+
+      # 5. Build the executable with Nuitka
+      - name: Build executable with Nuitka
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          ${{ steps.setup-python.outputs.python-path }} -m nuitka `
+            --onefile `
+            --windows-disable-console `
+            --enable-plugin=tkinter `
+            --enable-plugin=playwright `
+            --output-dir=dist `
+            --output-filename=SouvlakiScraper `
+            gui.py
+
+      # 6. Uploads the final .exe file
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
