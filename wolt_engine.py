@@ -16,9 +16,7 @@ FOOD_SEARCH_BUTTON = "a.sfeyiyl"
 SHOP_LINK = 'a[data-test-id^="venueCard"]'
 
 # --- NEW, "SMART" MENU SELECTORS ---
-# This is the parent "box" for one item
 ITEM_CARD = 'div[data-test-id="horizontal-item-card"]'
-# These are the selectors *inside* the card
 ITEM_NAME = "h3.tj9ydql"
 DEAL_PRICE = "span.dhz2cdy"
 REGULAR_PRICE = "span.p1boufgw"
@@ -28,7 +26,6 @@ MAX_SHOPS_TO_CHECK = 10
 def clean_price(price_text):
     """Turns a messy price string '€ 8,50' into a clean float 8.50."""
     try:
-        # Get only the numbers, comma, and dot
         cleaned = re.sub(r"[^0-9,.]", "", price_text)
         cleaned = cleaned.replace(",", ".")
         return float(cleaned)
@@ -50,7 +47,14 @@ def scrape_wolt(my_address, search_term):
         results = []
 
         try:
-            browser = p.firefox.launch(headless=True)
+            # --- THIS IS THE FIX ---
+            # Tell Playwright to use the system's "firefox" channel
+            browser = p.chromium.launch(
+                headless=True,
+                executable_path="/usr/bin/chromium"
+            )
+
+
             context = browser.new_context(
                 user_agent="Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:125.0) Gecko/20100101 Firefox/125.0",
                 viewport={'width': 1920, 'height': 1080}
@@ -142,34 +146,27 @@ def scrape_wolt(my_address, search_term):
                     print(f"Shop: {shop_name}")
 
                     # --- NEW "SMART" LOGIC ---
-                    # 1. Find all item "cards"
                     item_cards = menu_soup.select(ITEM_CARD)
                     print(f"Found {len(item_cards)} item cards. Scraping...")
 
                     for card in item_cards:
-                        # 2. Find the name *inside* this card
                         name_element = card.select_one(ITEM_NAME)
                         item_name = name_element.get_text(strip=True) if name_element else "Name Not Found"
 
-                        # 3. Find the price *inside* this card
                         price_text = ""
-                        # First, look for a deal price
                         deal_price_element = card.select_one(DEAL_PRICE)
                         if deal_price_element:
                             price_text = deal_price_element.get_text(strip=True)
                         else:
-                            # If no deal, look for a regular price
                             regular_price_element = card.select_one(REGULAR_PRICE)
                             if regular_price_element:
                                 price_text = regular_price_element.get_text(strip=True)
 
                         if not price_text:
-                            # Skip items with no price (e.g., "Category" titles)
                             continue
 
                         item_price = clean_price(price_text)
 
-                        # 4. Add the (now correctly-paired) item to our list
                         results.append((shop_name, url, item_name, item_price))
 
                     print(f"Successfully scraped {len(item_cards)} items.")
@@ -182,7 +179,6 @@ def scrape_wolt(my_address, search_term):
         except Exception as e:
             print("\nAn error occurred:")
             print(f"Error details: {e}")
-            print("Saving screenshot...")
             if 'page' in locals():
                 page.screenshot(path="error_screenshot_wolt.png")
 
