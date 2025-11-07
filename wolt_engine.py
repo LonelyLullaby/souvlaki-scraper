@@ -153,8 +153,16 @@ def scrape_wolt(my_address, search_term):
             page.locator(FOOD_SEARCH_BUTTON).first.click()
             print("Search submitted.")
             
-            page.wait_for_selector(SHOP_LINK, timeout=15000)
-            human_like_pause(2.0, 4.0)
+            # --- MODIFIED: ADDED "NO RESULTS" CHECK ---
+            try:
+                print("Waiting for restaurant links to appear...")
+                page.wait_for_selector(SHOP_LINK, timeout=15000)
+                human_like_pause(2.0, 4.0)
+            except Exception as e:
+                print("--- No restaurants found for this search. ---")
+                # Return an empty list, which the GUI will handle
+                return [] 
+            # --------------------------------------------
 
             # --- PHASE 3: SCRAPE SHOP LINKS FROM RESULTS PAGE ---
             print("Finding shop links on results page...")
