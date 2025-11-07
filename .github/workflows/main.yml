@@ -40,9 +40,8 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          # This is the final, one-line command with the *correct* Nuitka icon command
-          ${{ steps.setup-python.outputs.python-path }} -m nuitka --onefile --windows-console-mode=disable --enable-plugin=tk-inter --enable-plugin=playwright --assume-yes-for-downloads --windows-icon-from-ico=souvlaki.ico --output-dir=dist --output-filename=SouvlakiScraper gui.py
-
+          # --- MODIFIED: Removed console-mode=disable and changed name ---
+          ${{ steps.setup-python.outputs.python-path }} -m nuitka --onefile --enable-plugin=tk-inter --enable-plugin=playwright --assume-yes-for-downloads --windows-icon-from-ico=souvlaki.ico --output-dir=dist --output-filename=SouvlakiScraper_DEBUG gui.py
       # 6. Uploads the final .exe file
       - name: Upload artifact
         uses: actions/upload-artifact@v4
